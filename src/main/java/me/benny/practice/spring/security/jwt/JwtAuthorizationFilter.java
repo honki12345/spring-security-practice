@@ -36,18 +36,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     ) throws IOException, ServletException {
         String token = null;
         try {
-            // cookie 에서 JWT token을 가져옵니다.
+            // cookie 에서 JWT token 을 가져옵니다.
             token = Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals(JwtProperties.COOKIE_NAME)).findFirst()
+                    .filter(cookie -> cookie.getName().equals(JwtProperties.COOKIE_NAME))
+                    .findFirst()
                     .map(Cookie::getValue)
                     .orElse(null);
         } catch (Exception ignored) {
+            // 아무것도 하지 않는다
         }
         if (token != null) {
             try {
-                Authentication authentication = getUsernamePasswordAuthenticationToken(token);
+                // Authentication 를 만들어서 SecurityContext 에 넣어준다
+                Authentication authentication = this.getUsernamePasswordAuthenticationToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
+                // 실패하면 쿠키 초기화
                 Cookie cookie = new Cookie(JwtProperties.COOKIE_NAME, null);
                 cookie.setMaxAge(0);
                 response.addCookie(cookie);
@@ -63,7 +67,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private Authentication getUsernamePasswordAuthenticationToken(String token) {
         String userName = JwtUtils.getUsername(token);
         if (userName != null) {
-            User user = userRepository.findByUsername(userName); // 유저를 유저명으로 찾습니다.
+            User user = userRepository.findByUsername(userName);
             return new UsernamePasswordAuthenticationToken(
                     user, // principal
                     null,

@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String token = JwtUtils.createToken(user);
         // 쿠키 생성
         Cookie cookie = new Cookie(JwtProperties.COOKIE_NAME, token);
-        cookie.setMaxAge(JwtProperties.EXPIRATION_TIME); // 쿠키의 만료시간 설정
+        cookie.setMaxAge(JwtProperties.EXPIRATION_TIME);
         cookie.setPath("/");
         response.addCookie(cookie);
         response.sendRedirect("/");
